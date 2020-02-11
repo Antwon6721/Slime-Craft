@@ -19,5 +19,14 @@ public class Blob extends Slime {
         super(SPEED, x, y, COLOR);
     }  
     
+    public void fight(Glob glob) {
+        if (super.collide(glob)) {
+            if (super.getStrength() >= glob.getStrength()) {
+                glob.die();
+            } else {
+                this.die();
+            }
+        }
+    }
     
 }

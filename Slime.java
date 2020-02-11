@@ -16,15 +16,34 @@ public class Slime extends Sprite {
     //static constants
     private static final int WIDTH = 10;
     private static final int HEIGHT = 15;
+    private int strength;
     
     
     public Slime(int speed, int x, int y, Color color) {
         super(speed, x, y, WIDTH, HEIGHT, color);
+        this.strength = (int) (Math.random() * 20);
     }
+    
+     public void eat(Food food) {
+        if (super.getBounds().intersects(food.getBounds()) && food.isAlive()) {
+            super.setHeight(super.getHeight() + 5);
+            super.setWidth(super.getWidth() + 5);
+            food.die();
+        }
+    }
+     public void didWin (Slime other) {
+         this.strength += this.strength - other.strength;
+         super.grow(1.5);
+     }
     
     @Override
     public void draw(Graphics g) {
         g.setColor(super.getColor());
         g.fillRect(super.getX(), super.getY(), super.getWidth(), super.getHeight());
     }
+
+    public int getStrength() {
+        return strength;
+    }
+    
 }
