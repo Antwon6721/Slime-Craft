@@ -5,7 +5,6 @@
  */
 package SlimeCraft;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Timer;
@@ -14,21 +13,21 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author jword
+ * @author 641580
  */
 public class World extends JPanel {
     private ArrayList<Blob> blobs = new ArrayList<>();    
     private ArrayList<Glob> globs = new ArrayList<>();    
     private ArrayList<Sprite> sprites = new ArrayList<>();
     private ArrayList<Food> foods = new ArrayList<>();   
-    private ArrayList<Slime> slimes = new ArrayList<>();   
+    private ArrayList<Slime> slimes = new ArrayList<>();    
     Timer timer;
     
     public World() {
         timer = new Timer();
-        timer.scheduleAtFixedRate(new ScheduleTask(), 100, 1000/30);
+        timer.scheduleAtFixedRate(new ScheduleTask(), 100, 1000/12);
         super.setSize(800, 600);
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 10; i++) {
             int x = (int) (Math.random() * 800 / 2);
             int y = (int) (Math.random() * 600);
             Blob blob = new Blob(x,y);
@@ -36,7 +35,7 @@ public class World extends JPanel {
             slimes.add(blob);
             blobs.add(blob);
         }
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 10; i++) {
             int x = (int) (Math.random() * 800 / 2 + 800 / 2);
             int y = (int) (Math.random() * 600);
             Glob glob = new Glob(x,y);
@@ -44,8 +43,8 @@ public class World extends JPanel {
             slimes.add(glob);    
             globs.add(glob);    
         }
-        for (int i = 0; i < 200; i++) {
-            int x = (int) (Math.random() * 800 );
+        for (int i = 0; i < 10; i++) {
+            int x = (int) (Math.random() * 800);
             int y = (int) (Math.random() * 600);
             Food food = new Food(x,y);
             foods.add(food);
@@ -55,30 +54,46 @@ public class World extends JPanel {
     
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-         this.setBackground(Color.BLACK);
-        for (Sprite sprite : sprites) {
-            sprite.draw(g);
-            sprite.update();
-            for (Sprite other : sprites) {
-                if (sprite != other) {
-                    sprite.collide(other);
-                }
-            }
-            
-        }
+        
         for (Slime slime : slimes) {
             for (Food food : foods) {
                 slime.eat(food);
             }            
         }
         
+        ArrayList<Blob> newBlobs = new ArrayList<>();
+        ArrayList<Glob> newGlobs = new ArrayList<>();
+        
         for (Blob blob : blobs) {
             for (Glob glob : globs) {
-                blob.fight(glob)
+                blob.fight(glob);
+            }
+            for (Blob otherBlob : blobs) {
+                if (blob == otherBlob) continue;
+                if (blob.collide(otherBlob) && Math.random() < 0.03)
+                    newBlobs.add(blob.reproduce(otherBlob));
             }
         }
+        for (Glob glob : globs) {
+            for (Glob otherGlob : globs) {
+                if (glob == otherGlob) continue;
+                if (glob.collide(otherGlob) && Math.random() < 0.03)
+                    newGlobs.add(glob.reproduce(otherGlob));
+            }
+        }
+        for (Sprite sprite : sprites) {
+            sprite.draw(g);
+            sprite.update();
+            sprite.collideWorldBounds(800,600);
+        }        
         
         takeOutTheTrash();
+        addNewSlimes(newBlobs, newGlobs);
+    }
+    
+    private void addNewSlimes(ArrayList<Blob> newBlobs, ArrayList<Glob> newGlobs) {
+        blobs.addAll(newBlobs);
+        globs.addAll(newGlobs);
     }
     
     private void takeOutTheTrash() {

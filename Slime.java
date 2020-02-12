@@ -31,9 +31,15 @@ public class Slime extends Sprite {
             food.die();
         }
     }
+     
+     public Slime reproduce(Slime mate) {
+         Slime baby = new Slime(super.getSpeed(), super.getX, super.getY, super.getColor);
+         return baby;
+     }
+     
      public void didWin (Slime other) {
          this.strength += this.strength - other.strength;
-         super.grow(1.5);
+         super.grow(1.2);
      }
     
     @Override
